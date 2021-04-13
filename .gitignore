@@ -9,4 +9,4 @@ node_modules
 *.sln
 *.sw*
 # baseUrl.js
-baseUrl.js
+/src/api/baseUrl.js
