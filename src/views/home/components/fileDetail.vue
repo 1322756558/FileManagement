@@ -1,7 +1,7 @@
 <!--
  * @Date: 2021-02-28 22:22:14
  * @LastEditors: zhou
- * @LastEditTime: 2021-04-06 16:35:24
+ * @LastEditTime: 2021-04-14 09:37:59
  * @FilePath: \yfkj\src\views\home\components\fileDetail.vue
 -->
 <template>
@@ -29,7 +29,7 @@
         >
       </a-form-model>
     </a-modal>
-  <a-button @click="addFile" style="float: left">
+    <a-button @click="addFile" style="float: left">
       <a-icon type="inbox" />上传文件
     </a-button>
     <a-modal
@@ -153,7 +153,6 @@
 
 <script>
 import moment from "moment";
-import path from "path";
 import baseUrl from "@/api/baseUrl";
 import Vue from "vue";
 export default {
@@ -248,22 +247,25 @@ export default {
         pageNum: this.pagination.current,
         pageSize: this.pagination.pageSize,
       });
+      getFileTableData.message.fileList.forEach((ele) => {
+        let fileType = ele.file_name.split(".")[1];
+        ele.canPreview = fileType;
+      });
       this.fileTableData = getFileTableData.message.fileList;
       this.pagination.total = getFileTableData.message.fileListSize;
       //console.log(this.fileTableData);
     },
     backList() {
       this.$emit("backList");
-      
     },
-    refreshList(){
+    refreshList() {
       this.$emit("refreshList");
     },
     addFolder() {
       this.addModalVisible = true;
     },
-    addFile(){
-      this.uploadModalVisible=true;
+    addFile() {
+      this.uploadModalVisible = true;
     },
     async onAddFolder() {
       //console.log(this.form.type.valueOf());
@@ -293,7 +295,7 @@ export default {
       }
     },
     openFolder(data) {
-      //console.log(data);
+      console.log(data);
       if (data.isFolder === true) {
         // console.log("打开文件夹");
         //根据id查找以下的文件树，若是没有则新建文件夹
@@ -302,15 +304,19 @@ export default {
         // this.hideDetail = "2";
         // this.$emit("changeDetail", this.hideDetail);
       } else {
-        const filePath = path.join(__dirname, "../upload/" + data.save_file);
-        // 组装成绝对路径
-        const fileResource = filePath + `/${data?.file_name}`;
-        let previePath =
-          "D:\\vue\\yfkj2\\3.24\\koa-quickstart\\src" + fileResource;
-        //需设置虚拟路径
-        //let previePath="file:///D:/vue/yfkj2/3.24/koa-quickstart/src/upload/%E9%A1%B9%E7%9B%AEAAAAA/057BD59A7047DCAFF4786F71FE765263.jpg";
-        console.log(previePath);
-        window.open(previePath, "_blank");
+        console.log(data);
+        if (
+          data.canPreview == "png" ||
+          data.canPreview == "jpg" ||
+          data.canPreview == "pdf"
+        ) {
+          this.$router.push({
+            name: "Preview",
+            params: { id: data.id, type: data.canPreview },
+          });
+        } else {
+          this.$message.error("当前格式不支持预览，仅支持图片及pdf格式");
+        }
       }
       //this.getTableData();
       //this.projectInfo = this.FolderDetail;

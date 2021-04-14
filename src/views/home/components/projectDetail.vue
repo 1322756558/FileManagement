@@ -1,8 +1,8 @@
 <!--
  * @Date: 2021-02-28 22:22:14
  * @LastEditors: zhou
- * @LastEditTime: 2021-04-08 23:51:53
- * @FilePath: /yfkj/src/views/home/components/projectDetail.vue
+ * @LastEditTime: 2021-04-13 11:09:15
+ * @FilePath: \yfkj\src\views\home\components\projectDetail.vue
 -->
 <template>
   <div class="main">
@@ -127,15 +127,6 @@
             "
             >打开</a-button
           >
-          <a-button
-            type="primary"
-            @click="
-              () => {
-                previewFile(record);
-              }
-            ">
-            预览
-          </a-button>
         </a-button-group>
       </span>
     </a-table>
@@ -162,7 +153,6 @@
 
 <script>
 import moment from "moment";
-import path from "path";
 import baseUrl from "@/api/baseUrl";
 import Vue from "vue";
 export default {
@@ -254,17 +244,17 @@ export default {
         pageNum: this.pagination.current,
         pageSize: this.pagination.pageSize,
       });
-      getFileTableData.message.fileList.forEach(ele => {
-        let fileType = ele.file_name.split('.')[1]
-        ele.canPreview = fileType
-      })
+      getFileTableData.message.fileList.forEach((ele) => {
+        let fileType = ele.file_name.split(".")[1];
+        ele.canPreview = fileType;
+      });
       this.fileTableData = getFileTableData.message.fileList;
       this.pagination.total = getFileTableData.message.fileListSize;
     },
     backList() {
       this.$emit("backList");
     },
-    refreshList(){
+    refreshList() {
       this.$emit("refreshList");
     },
     addFolder() {
@@ -309,16 +299,19 @@ export default {
         this.hideDetail = "2";
         this.$emit("changeDetail", this.hideDetail);
       } else {
-        this.$message.success("预览模式还未开放");
-        const filePath = path.join(__dirname, "../upload/" + data.save_file);
-        // 组装成绝对路径
-        const fileResource = filePath + `/${data?.file_name}`;
-        let previePath =
-          "D:\\vue\\yfkj2\\3.24\\koa-quickstart\\src" + fileResource;
-        //需设置虚拟路径
-        //let previePath="file:///D:/vue/yfkj2/3.24/koa-quickstart/src/upload/%E9%A1%B9%E7%9B%AEAAAAA/057BD59A7047DCAFF4786F71FE765263.jpg";
-        console.log(previePath);
-        window.open(previePath, "_blank");
+        console.log(data);
+        if (
+          data.canPreview == "png" ||
+          data.canPreview == "jpg" ||
+          data.canPreview == "pdf"
+        ) {
+          this.$router.push({
+            name: "Preview",
+            params: { id: data.id, type: data.canPreview },
+          });
+        } else {
+          this.$message.error("当前格式不支持预览，仅支持图片及pdf格式");
+        }
       }
       //this.projectInfo = this.FolderDetail;
       //this.hideDetail = false;
@@ -423,14 +416,6 @@ export default {
           this.$message.err("移动失败");
         });
     },
-    previewFile(record){
-      console.log(record)
-      if(record.canPreview == 'png' || record.canPreview == 'jpg' || record.canPreview == 'pdf'){
-          this.$router.push({ name: "Preview", params: {id: record.id, type: record.canPreview} });
-      }else{
-        this.$message.error('当前格式不支持预览，仅支持图片及pdf格式')
-      }
-    }
   },
 };
 </script>

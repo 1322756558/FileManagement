@@ -1,7 +1,7 @@
 /*
  * @Date: 2021-02-28 22:22:14
  * @LastEditors: zhou
- * @LastEditTime: 2021-03-27 23:52:45
+ * @LastEditTime: 2021-04-14 09:41:46
  * @FilePath: \yfkj\src\api\home.js
  */
 
@@ -84,6 +84,13 @@ export default {
   selectOnlyProject:param=>{
     return axios({
       url:baseUrl+'/project/selectOnlyProject',
+      method:'post',
+      data:param
+    })
+  },
+  selectOnlyFile:param=>{
+    return axios({
+      url:baseUrl+'/file/selectOnlyFile',
       method:'post',
       data:param
     })

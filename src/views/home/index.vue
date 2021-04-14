@@ -1,7 +1,7 @@
 <!--
  * @Date: 2021-02-28 22:22:14
  * @LastEditors: zhou
- * @LastEditTime: 2021-04-06 19:13:53
+ * @LastEditTime: 2021-04-14 10:17:16
  * @FilePath: \yfkj\src\views\home\index.vue
 -->
 <template>
@@ -168,13 +168,11 @@
             @search="addProjectTypeForName"
           />
         </a-modal>
-        <a-menu-item key="4" @click="toLogin">
-          退出登录
-        </a-menu-item>
+        <a-menu-item key="4" @click="toLogin"> 退出登录 </a-menu-item>
       </a-menu>
     </a-layout-header>
     <a-layout>
-      <a-layout-sider width="200" style="background-color: #fff;">
+      <a-layout-sider width="200" style="background-color: #fff">
         <!-- <a-menu
           mode="inline"
           :default-selected-keys="['1']"
@@ -363,15 +361,21 @@ export default {
       fileTrees: [],
     };
   },
-  created () {
+  created() {
     // 在页面加载时读取sessionStorage
-    if (sessionStorage.getItem('store')) {
-      this.$store.replaceState(Object.assign({}, this.$store.state, JSON.parse(sessionStorage.getItem('store'))))
+    if (sessionStorage.getItem("store")) {
+      this.$store.replaceState(
+        Object.assign(
+          {},
+          this.$store.state,
+          JSON.parse(sessionStorage.getItem("store"))
+        )
+      );
     }
     // 在页面刷新时将store保存到sessionStorage里
-    window.addEventListener('beforeunload', () => {
-      sessionStorage.setItem('store', JSON.stringify(this.$store.state))
-    })
+    window.addEventListener("beforeunload", () => {
+      sessionStorage.setItem("store", JSON.stringify(this.$store.state));
+    });
   },
   //初始化方法
   mounted() {
@@ -436,10 +440,11 @@ export default {
         p.then(
           (value) => {
             // 接收得到成功的数据   onResolved
-           // console.log("成功的回调", value);
+            // console.log("成功的回调", value);
             //console.log(value.message);
             this.fileTree = this.toTree(value.message);
             item.children = this.fileTree;
+            item.id = "1-" + item.id;
           },
           (reason) => {
             // 接收得到失败的reason数据   onRejected
@@ -453,13 +458,14 @@ export default {
         // item.children = this.fileTree;
       });
 
+      //这棵树第一层是0.id，1.id，id
       //  空对象
       let map = {};
-      this.yearList=[];//清空
+      this.yearList = []; //清空
       getProject.forEach((item) => {
         if (!map[item.year]) {
           this.yearList.push({
-            id: item.id,
+            id: "0-" + item.id,
             children: [item],
             file_name: item.year,
           });
@@ -472,7 +478,7 @@ export default {
           });
         }
       });
-
+      console.log(this.yearList);
       // /**
       //  * map对象的 键: 是每个id  值：对应的item
       //  * 1: {id: 1, pid: 0, name: "body"}
@@ -689,21 +695,42 @@ export default {
       //console.log(result);
       return result;
     },
-    async onSelect(keys) {
+    async onSelect(keys, event) {
       this.hideDetail = "0";
-      //console.log("选择", keys, event);
-      // console.log(keys.toString());
-      let project = await this.$WebApi["home"].selectOnlyProject({
-        projectId: keys.toString(),
-      });
-      //console.log(project)
-      //如果不存在错误信息
-      if (!project.message) {
-        this.projectInfo = project;
-        this.hideDetail = "1";
-        this.$message.success("打开了"+project.project_name);
-      }else{
-        this.$message.error("文件预览还未完成");
+      console.log("选择", keys, event);
+      let keysType = keys.toString().split("-")[0]; //当file id为1时,则不成立
+      let keysValue = keys.toString().split("-")[1];
+      console.log(keysType, keysValue);
+      if (keysType === "0" || keysType === "1") {
+        let project = await this.$WebApi["home"].selectOnlyProject({
+          projectId: keysValue,
+        });
+        //console.log(project)
+        //如果不存在错误信息
+        if (!project.message) {
+          this.projectInfo = project;
+          this.hideDetail = "1";
+          this.$message.success("打开了" + project.project_name);
+        } else {
+          this.$message.error("打开项目错误");
+        }
+      } else {
+        let file = await this.$WebApi["home"].selectOnlyFile({
+          fileId: keysType,
+        });
+        //如果不存在错误信息
+        if (!file.message) {
+          if (file.isFolder === true) {
+            this.fileInfo = file;
+            this.hideDetail = "2";
+            console.log(file);
+            this.$message.success("打开了" + file.file_name);
+          } else {
+            this.$message.error("预览错误");
+          }
+        } else {
+          this.$message.error("打开文件错误");
+        }
       }
     },
     onExpand() {
@@ -712,7 +739,7 @@ export default {
     backList() {
       this.hideDetail = "0";
     },
-    refreshList(){
+    refreshList() {
       this.getAllProject();
     },
     listenToChildEvent(fileInfo) {
@@ -741,6 +768,6 @@ export default {
   height: 100%;
 }
 .an-directory-tree-label {
-    text-align: left;
+  text-align: left;
 }
 </style>
