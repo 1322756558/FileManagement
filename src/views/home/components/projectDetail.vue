@@ -1,8 +1,8 @@
 <!--
  * @Date: 2021-02-28 22:22:14
  * @LastEditors: zhou
- * @LastEditTime: 2021-04-13 11:09:15
- * @FilePath: \yfkj\src\views\home\components\projectDetail.vue
+ * @LastEditTime: 2021-04-14 11:46:03
+ * @FilePath: \FileManagement\src\views\home\components\projectDetail.vue
 -->
 <template>
   <div class="main">
@@ -234,7 +234,7 @@ export default {
     };
     this.getTableData();
     // console.log("---------------------");
-    // console.log(this.projectInfo);
+     console.log(this.projectInfo);
   },
   methods: {
     async getTableData() {
@@ -245,7 +245,7 @@ export default {
         pageSize: this.pagination.pageSize,
       });
       getFileTableData.message.fileList.forEach((ele) => {
-        let fileType = ele.file_name.split(".")[1];
+        let fileType = ele.file_name.substring(ele.file_name.lastIndexOf(".")+1);
         ele.canPreview = fileType;
       });
       this.fileTableData = getFileTableData.message.fileList;

@@ -1,8 +1,8 @@
 <!--
  * @Date: 2021-02-28 22:22:14
  * @LastEditors: zhou
- * @LastEditTime: 2021-04-14 10:17:16
- * @FilePath: \yfkj\src\views\home\index.vue
+ * @LastEditTime: 2021-04-14 13:06:49
+ * @FilePath: \FileManagement\src\views\home\index.vue
 -->
 <template>
   <a-layout id="main" class="main">
@@ -354,7 +354,7 @@ export default {
       Types: {},
       fileTree: [],
       replaceFields: {
-        key: "id",
+        key: "Tid",
         children: "children",
         title: "file_name",
       },
@@ -444,7 +444,7 @@ export default {
             //console.log(value.message);
             this.fileTree = this.toTree(value.message);
             item.children = this.fileTree;
-            item.id = "1-" + item.id;
+            item.Tid = "1-" + item.id;
           },
           (reason) => {
             // 接收得到失败的reason数据   onRejected
@@ -458,14 +458,15 @@ export default {
         // item.children = this.fileTree;
       });
 
-      //这棵树第一层是0.id，1.id，id
+      //这棵树第一层是0-id，1-id，id
       //  空对象
       let map = {};
       this.yearList = []; //清空
       getProject.forEach((item) => {
         if (!map[item.year]) {
           this.yearList.push({
-            id: "0-" + item.id,
+            Tid: "0-" + item.id,
+            id:item.id,
             children: [item],
             file_name: item.year,
           });
@@ -669,6 +670,7 @@ export default {
       // 遍历  删除  children 属性  做初始化操作
       data.forEach((item) => {
         delete item.children;
+        item.Tid=item.id;
       });
       //  空对象
       let map = {};
@@ -726,7 +728,21 @@ export default {
             console.log(file);
             this.$message.success("打开了" + file.file_name);
           } else {
-            this.$message.error("预览错误");
+            let fileType = file.file_name.substring(file.file_name.lastIndexOf(".")+1);//取最后一位小数点
+            file.canPreview = fileType;
+            console.log(fileType);
+            if (
+              file.canPreview == "png" ||
+              file.canPreview == "jpg" ||
+              file.canPreview == "pdf"
+            ) {
+              this.$router.push({
+                name: "Preview",
+                params: { id: file.id, type: file.canPreview },
+              });
+            } else {
+              this.$message.error("当前格式不支持预览，仅支持图片及pdf格式");
+            }
           }
         } else {
           this.$message.error("打开文件错误");

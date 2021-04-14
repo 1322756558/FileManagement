@@ -1,8 +1,8 @@
 <!--
  * @Date: 2021-02-28 22:22:14
  * @LastEditors: zhou
- * @LastEditTime: 2021-04-14 09:37:59
- * @FilePath: \yfkj\src\views\home\components\fileDetail.vue
+ * @LastEditTime: 2021-04-14 11:18:02
+ * @FilePath: \FileManagement\src\views\home\components\fileDetail.vue
 -->
 <template>
   <div class="main">
@@ -248,7 +248,7 @@ export default {
         pageSize: this.pagination.pageSize,
       });
       getFileTableData.message.fileList.forEach((ele) => {
-        let fileType = ele.file_name.split(".")[1];
+        let fileType = ele.file_name.substring(ele.file_name.lastIndexOf(".")+1);
         ele.canPreview = fileType;
       });
       this.fileTableData = getFileTableData.message.fileList;
