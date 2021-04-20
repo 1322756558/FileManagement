@@ -1,7 +1,7 @@
 <!--
  * @Date: 2021-02-28 22:22:14
  * @LastEditors: zhou
- * @LastEditTime: 2021-04-14 13:06:49
+ * @LastEditTime: 2021-04-20 12:41:50
  * @FilePath: \FileManagement\src\views\home\index.vue
 -->
 <template>
@@ -102,7 +102,32 @@
                 >
                   删除项目
                 </a-button>
+                <a-button
+                  type="primary"
+                  @click="
+                    () => {
+                      torenameProject(item.id);
+                    }
+                  "
+                  block
+                >
+                  重命名项目
+                </a-button>
               </div>
+
+              <a-modal
+                v-model="renameVisible"
+                title="重命名项目"
+                centered
+                :footer="null"
+              >
+                <a-input-search
+                  placeholder="请输入项目类型"
+                  enter-button="添加"
+                  size="large"
+                  @search="renameProject"
+                />
+              </a-modal>
             </a-collapse-panel>
           </a-collapse>
         </a-modal>
@@ -341,8 +366,10 @@ export default {
       selectedKeys: [],
       addModalVisible: false,
       addModalTypeVisible: false,
+      renameVisible: false,
       moment,
       hideDetail: "0",
+      renameInfo: undefined,
       projectInfo: {},
       fileInfo: {},
       typeName: {},
@@ -399,7 +426,7 @@ export default {
         }
       });
       this.allUserList = newList;
-      //console.log(this.allUserList);
+      console.log(this.allUserList);
       // 所有项目信息
       this.getAllProject();
     },
@@ -409,8 +436,7 @@ export default {
         momentEnd,
       });
       this.projectList = getProject;
-      //console.log(getProject);
-
+      console.log(getProject);
       // 判断不是数组  直接返回
       if (!Array.isArray(getProject)) {
         console.log("非数组");
@@ -466,7 +492,7 @@ export default {
         if (!map[item.year]) {
           this.yearList.push({
             Tid: "0-" + item.id,
-            id:item.id,
+            id: item.id,
             children: [item],
             file_name: item.year,
           });
@@ -479,7 +505,7 @@ export default {
           });
         }
       });
-      console.log(this.yearList);
+      //console.log(this.yearList);
       // /**
       //  * map对象的 键: 是每个id  值：对应的item
       //  * 1: {id: 1, pid: 0, name: "body"}
@@ -626,6 +652,23 @@ export default {
         },
       });
     },
+    torenameProject(id) {
+      this.renameInfo = id;
+      this.renameVisible = true;
+    },
+    async renameProject(value) {
+      let type = await this.$WebApi["home"].renameProject({
+        projectId: this.renameInfo,
+        newProjectName: value,
+      });
+      if (type == "success") {
+        this.$message.success("添加成功");
+        this.renameVisible = false;
+        this.getAllProject();
+      } else {
+        this.$message.error("添加失败");
+      }
+    },
     toProjectDetail(item) {
       this.projectInfo = item;
       this.hideDetail = "1";
@@ -645,7 +688,7 @@ export default {
         this.$message.error("添加失败");
       }
     },
-    //test 筛选项目类型
+    //筛选项目类型
     async handleMenuClick(e) {
       await this.getAllProject();
       let key = e.key;
@@ -670,7 +713,7 @@ export default {
       // 遍历  删除  children 属性  做初始化操作
       data.forEach((item) => {
         delete item.children;
-        item.Tid=item.id;
+        item.Tid = item.id;
       });
       //  空对象
       let map = {};
@@ -694,20 +737,18 @@ export default {
           result.push(item);
         }
       });
-      //console.log(result);
       return result;
     },
-    async onSelect(keys, event) {
+    async onSelect(keys) {
       this.hideDetail = "0";
-      console.log("选择", keys, event);
+      //console.log("选择", keys, event);
       let keysType = keys.toString().split("-")[0]; //当file id为1时,则不成立
       let keysValue = keys.toString().split("-")[1];
-      console.log(keysType, keysValue);
+      //console.log(keysType, keysValue);
       if (keysType === "0" || keysType === "1") {
         let project = await this.$WebApi["home"].selectOnlyProject({
           projectId: keysValue,
         });
-        //console.log(project)
         //如果不存在错误信息
         if (!project.message) {
           this.projectInfo = project;
@@ -725,12 +766,14 @@ export default {
           if (file.isFolder === true) {
             this.fileInfo = file;
             this.hideDetail = "2";
-            console.log(file);
+            //console.log(file);
             this.$message.success("打开了" + file.file_name);
           } else {
-            let fileType = file.file_name.substring(file.file_name.lastIndexOf(".")+1);//取最后一位小数点
+            let fileType = file.file_name.substring(
+              file.file_name.lastIndexOf(".") + 1
+            ); //取最后一位小数点
             file.canPreview = fileType;
-            console.log(fileType);
+            //console.log(fileType);
             if (
               file.canPreview == "png" ||
               file.canPreview == "jpg" ||
@@ -760,7 +803,6 @@ export default {
     },
     listenToChildEvent(fileInfo) {
       this.fileInfo = fileInfo;
-      console.log(this.fileInfo);
     },
     changeDetail(hideDetail) {
       this.hideDetail = hideDetail;
@@ -774,10 +816,10 @@ export default {
 
 <style lang="less" scoped>
 .logo {
-  width: 120px;
-  height: 31px;
-  background: rgba(255, 255, 255, 0.2);
-  margin: 16px 28px 16px 0;
+  width: 60px;
+  height: 53px;
+  background: url(../../assets/logo2.png);
+  margin: 6px 28px 16px 0;
   float: left;
 }
 .main {
@@ -785,5 +827,6 @@ export default {
 }
 .an-directory-tree-label {
   text-align: left;
+  overflow: auto;
 }
 </style>

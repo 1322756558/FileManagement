@@ -1,8 +1,8 @@
 /*
  * @Date: 2021-02-28 22:22:14
  * @LastEditors: zhou
- * @LastEditTime: 2021-04-14 09:41:46
- * @FilePath: \yfkj\src\api\home.js
+ * @LastEditTime: 2021-04-19 15:28:34
+ * @FilePath: \FileManagement\src\api\home.js
  */
 
 // 获取项目
@@ -98,6 +98,13 @@ export default {
   selectFileTreeByID:param=>{
     return axios({
       url:baseUrl+'/file/selectFileTreeByID',
+      method:'post',
+      data:param
+    })
+  },
+  renameProject:param=>{
+    return axios({
+      url:baseUrl+'/project/renameProject',
       method:'post',
       data:param
     })

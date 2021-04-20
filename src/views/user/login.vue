@@ -1,13 +1,13 @@
 <!--
  * @Date: 2021-03-08 16:59:05
  * @LastEditors: zhou
- * @LastEditTime: 2021-03-08 21:32:19
- * @FilePath: \yfkj\src\views\user\login.vue
+ * @LastEditTime: 2021-04-14 13:24:10
+ * @FilePath: \FileManagement\src\views\user\login.vue
 -->
 
 <template>
   <div class="login-container">
-    <h2 class="login-title">项目管理系统</h2>
+    <h2 class="login-title">华耕项目管理系统</h2>
     <a-form-model
       ref="ruleForm"
       :model="form"
@@ -16,7 +16,7 @@
       :wrapper-col="wrapperCol"
       class="login-form"
     >
-      <h2 class="title">用户注册 REGISTER</h2>
+      <h2 class="title">用户登录</h2>
       <a-form-model-item ref="username" label="用户名" prop="username">
         <a-input v-model="form.username" ><img :src="user" slot="prefix" alt="" /></a-input>
       </a-form-model-item>

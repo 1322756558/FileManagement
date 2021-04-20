@@ -1,7 +1,7 @@
 <!--
  * @Date: 2021-02-28 22:22:14
  * @LastEditors: zhou
- * @LastEditTime: 2021-04-14 11:46:03
+ * @LastEditTime: 2021-04-18 19:13:44
  * @FilePath: \FileManagement\src\views\home\components\projectDetail.vue
 -->
 <template>
@@ -84,7 +84,7 @@
               () => {
                 deleteFile(record);
               }
-            "
+            " v-if="isAdmin"
           >
             删除
           </a-button>
@@ -104,7 +104,7 @@
               () => {
                 renameFile(record);
               }
-            "
+            " v-if="isAdmin"
           >
             重命名
           </a-button>
@@ -114,7 +114,7 @@
               () => {
                 moveFile(record);
               }
-            "
+            " v-if="isAdmin"
           >
             移动
           </a-button>
@@ -162,6 +162,7 @@ export default {
       baseUrl,
       headers: {},
       UserId: "0",
+      isAdmin: false,
       addModalVisible: false,
       uploadModalVisible: false,
       hideDetail: "1",
@@ -232,9 +233,11 @@ export default {
     this.headers = {
       Authorization: token,
     };
+    this.isAdmin = this.$store.state.userInfo.admin;
+   // console.log(this.isAdmin)
     this.getTableData();
     // console.log("---------------------");
-     console.log(this.projectInfo);
+     //console.log(this.projectInfo);
   },
   methods: {
     async getTableData() {

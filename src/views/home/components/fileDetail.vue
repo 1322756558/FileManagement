@@ -1,7 +1,7 @@
 <!--
  * @Date: 2021-02-28 22:22:14
  * @LastEditors: zhou
- * @LastEditTime: 2021-04-14 11:18:02
+ * @LastEditTime: 2021-04-18 19:10:48
  * @FilePath: \FileManagement\src\views\home\components\fileDetail.vue
 -->
 <template>
@@ -85,6 +85,7 @@
                 deleteFile(record);
               }
             "
+            v-if="isAdmin"
           >
             删除
           </a-button>
@@ -105,6 +106,7 @@
                 renameFile(record);
               }
             "
+            v-if="isAdmin"
           >
             重命名
           </a-button>
@@ -115,6 +117,7 @@
                 moveFile(record);
               }
             "
+            v-if="isAdmin"
           >
             移动
           </a-button>
@@ -162,6 +165,7 @@ export default {
       baseUrl,
       headers: {},
       UserId: "0",
+      isAdmin: false,
       addModalVisible: false,
       uploadModalVisible: false,
       form: {
@@ -235,6 +239,8 @@ export default {
     this.headers = {
       Authorization: token,
     };
+    this.isAdmin = this.$store.state.userInfo.admin;
+    //console.log(this.isAdmin)
     this.getTableData();
     // console.log("---------------------");
     // console.log(this.fileInfo);
@@ -248,7 +254,9 @@ export default {
         pageSize: this.pagination.pageSize,
       });
       getFileTableData.message.fileList.forEach((ele) => {
-        let fileType = ele.file_name.substring(ele.file_name.lastIndexOf(".")+1);
+        let fileType = ele.file_name.substring(
+          ele.file_name.lastIndexOf(".") + 1
+        );
         ele.canPreview = fileType;
       });
       this.fileTableData = getFileTableData.message.fileList;
