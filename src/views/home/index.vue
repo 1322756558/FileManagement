@@ -1,7 +1,7 @@
 <!--
  * @Date: 2021-02-28 22:22:14
- * @LastEditors: zhou
- * @LastEditTime: 2021-04-20 12:41:50
+ * @LastEditors: junhui li
+ * @LastEditTime: 2021-04-22 21:43:09
  * @FilePath: \FileManagement\src\views\home\index.vue
 -->
 <template>
@@ -825,8 +825,28 @@ export default {
 .main {
   height: 100%;
 }
-.an-directory-tree-label {
+/deep/ .an-directory-tree-label {
   text-align: left;
   overflow: auto;
+}
+
+/deep/ .ant-layout-sider-children{
+  display: flex;
+}
+
+// 鼠标放置上面文字突出出来
+/deep/ .ant-tree-directory {
+  position: unset;
+
+  .ant-tree-title {
+    &:hover{
+      position: absolute !important;
+    }
+  }
+}
+
+// 防止选中后文字颜色变白变透明导致看不清
+/deep/ .ant-tree.ant-tree-directory > li span.ant-tree-node-content-wrapper.ant-tree-node-selected, .ant-tree.ant-tree-directory .ant-tree-child-tree > li span.ant-tree-node-content-wrapper.ant-tree-node-selected{
+  color: rgba(0, 0, 0, 0.65);
 }
 </style>
