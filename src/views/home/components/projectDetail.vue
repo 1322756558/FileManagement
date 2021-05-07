@@ -1,7 +1,7 @@
 <!--
  * @Date: 2021-02-28 22:22:14
  * @LastEditors: zhou
- * @LastEditTime: 2021-04-18 19:13:44
+ * @LastEditTime: 2021-05-07 13:54:16
  * @FilePath: \FileManagement\src\views\home\components\projectDetail.vue
 -->
 <template>
@@ -15,6 +15,16 @@
     <a-button @click="addFile" style="float: left">
       <a-icon type="inbox" />上传文件
     </a-button>
+    <a-upload
+      :action="baseUrl + '/file/uploadFolder2'"
+      directory
+      style="float: left"
+      @change="changesData"
+      :headers="headers"
+      :data="projectInfo"
+    >
+      <a-button> <a-icon type="upload" /> 上传文件夹 </a-button>
+    </a-upload>
     <a-modal
       v-model="addModalVisible"
       title="添加文件夹"
@@ -84,7 +94,8 @@
               () => {
                 deleteFile(record);
               }
-            " v-if="isAdmin"
+            "
+            v-if="isAdmin"
           >
             删除
           </a-button>
@@ -104,7 +115,8 @@
               () => {
                 renameFile(record);
               }
-            " v-if="isAdmin"
+            "
+            v-if="isAdmin"
           >
             重命名
           </a-button>
@@ -114,7 +126,8 @@
               () => {
                 moveFile(record);
               }
-            " v-if="isAdmin"
+            "
+            v-if="isAdmin"
           >
             移动
           </a-button>
@@ -234,10 +247,10 @@ export default {
       Authorization: token,
     };
     this.isAdmin = this.$store.state.userInfo.admin;
-   // console.log(this.isAdmin)
+    // console.log(this.isAdmin)
     this.getTableData();
     // console.log("---------------------");
-     //console.log(this.projectInfo);
+    //console.log(this.projectInfo);
   },
   methods: {
     async getTableData() {
@@ -248,7 +261,9 @@ export default {
         pageSize: this.pagination.pageSize,
       });
       getFileTableData.message.fileList.forEach((ele) => {
-        let fileType = ele.file_name.substring(ele.file_name.lastIndexOf(".")+1);
+        let fileType = ele.file_name.substring(
+          ele.file_name.lastIndexOf(".") + 1
+        );
         ele.canPreview = fileType;
       });
       this.fileTableData = getFileTableData.message.fileList;
@@ -320,6 +335,18 @@ export default {
       //this.hideDetail = false;
     },
     handleChange(info) {
+      const status = info.file.status;
+      if (status !== "uploading") {
+        console.log(info.file, info.fileList);
+      }
+      if (status === "done") {
+        this.$message.success(`${info.file.name} 上传成功.`);
+        this.getTableData();
+      } else if (status === "error") {
+        this.$message.error("上传失败" + info.file.response.message);
+      }
+    },
+    changesData(info) {
       const status = info.file.status;
       if (status !== "uploading") {
         console.log(info.file, info.fileList);
