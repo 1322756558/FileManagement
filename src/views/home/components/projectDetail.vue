@@ -1,7 +1,7 @@
 <!--
  * @Date: 2021-02-28 22:22:14
- * @LastEditors: zhou
- * @LastEditTime: 2021-05-07 13:54:16
+ * @LastEditors: junhui li
+ * @LastEditTime: 2021-05-11 16:02:13
  * @FilePath: \FileManagement\src\views\home\components\projectDetail.vue
 -->
 <template>
@@ -17,6 +17,7 @@
     </a-button>
     <a-upload
       :action="baseUrl + '/file/uploadFolder2'"
+      :beforeUpload="beforeUpload"
       directory
       style="float: left"
       @change="changesData"
@@ -445,6 +446,21 @@ export default {
           console.log(err);
           this.$message.err("移动失败");
         });
+    },
+    beforeUpload(file, fileList) {
+      console.log("调用", file.uid);
+      return new Promise((resolve) => {
+        let fileUid = 0;
+        fileList.forEach((element, index) => {
+          if (file.uid === element.uid) {
+            fileUid = index;
+          }
+        });
+        setTimeout(() => {
+          console.log("resolve", file.uid);
+          resolve();
+        }, fileUid * 1000);
+      });
     },
   },
 };
